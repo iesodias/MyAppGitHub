@@ -1,0 +1,50 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+name: '1.0.0.$(build.BuildID)'
+
+trigger:
+- main
+
+parameters:
+- name: Image
+  displayName: Pool Image
+  type: string
+  default: ubuntu-latest
+  values:
+  - windows-latest
+  - ubuntu-latest
+  - macOS-latest
+- name: test
+  displayName: Run Tests?
+  type: boolean
+  default: false
+- name: PathToBuild
+  type: string
+  default: '**/*.csproj'
+- name: PathToTest
+  type: string
+  default: '**/*[Tt]ests/*.csproj'
+- name: BuildConfiguration
+  type: string
+  default: 'Release'
+- name: jobName
+  type: string
+  default: 'Release1'
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: Projetos/AzurePipelineTemplates
+
+stages:
+- template: build/stages/dotnet-core.yaml@templates
+  parameters:
+    test: ${{ parameters.test }}
+    PathToBuild: ${{ parameters.pathtobuild }}
+    PathToTest: ${{ parameters.pathtotest }}
+    BuildConfiguration: ${{ parameters.BuildConfiguration }}
+    jobName: ${{ parameters.jobname }}
+
